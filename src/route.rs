@@ -1,15 +1,14 @@
-use crate::handler::{discord_seafile_transformer, handler_404, home_handler};
+use crate::handler::{discord_seafile_redirect, discord_seafile_redirect_head, discord_seafile_transformer, handler_404, home_handler};
 use std::sync::Arc;
 
 use anyhow::Result;
 use axum::{
-    middleware::from_fn_with_state,
-    routing::{delete, get, post},
+    routing::get,
     Router,
 };
+use axum::routing::head;
 use tokio::sync::RwLock;
 use tracing::info;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use crate::config::Config;
 
 pub async fn serve(state: Config) -> Result<()> {
@@ -33,14 +32,14 @@ pub async fn serve(state: Config) -> Result<()> {
 }
 
 fn create_router(state: Config) -> Router {
-
-    // Get the current directory for serving assets
-    let assets_path = std::env::current_dir().unwrap();
-
     // General router of our application
     Router::new()
         .route("/", get(home_handler))
         .route("/:id", get(discord_seafile_transformer))
+
+        // ඞ
+        .route("/:id/file.:ext", head(discord_seafile_redirect_head))
+        .route("/:id/file.:ext", get(discord_seafile_redirect))
         .with_state(Arc::new(RwLock::new(state)))
         .fallback(handler_404) // Add a Fallback service for handling unknown paths
 }
