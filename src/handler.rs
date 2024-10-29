@@ -10,10 +10,7 @@ use axum::http::header::CONTENT_LENGTH;
 use tokio::sync::RwLock;
 
 pub async fn home_handler() -> impl IntoResponse {
-    HtmlTemplate(HomeTemplate {
-        host: "?".to_string(),
-        id: "amoghus".to_string(),
-    })
+    HtmlTemplate(HomeTemplate {})
 }
 
 pub async fn discord_seafile_transformer(
@@ -33,6 +30,8 @@ pub async fn discord_seafile_transformer(
         id,
         host: host.clone(),
         ext: extension,
+        thumb_id: state.thumb_id.clone(),
+        title: state.title.clone(),
     })
 }
 
@@ -75,8 +74,6 @@ struct Error404Template {}
 #[derive(Default, Template)]
 #[template(path = "home.html")]
 struct HomeTemplate {
-    id: String,
-    host: String,
 }
 
 /// Embed template
@@ -86,6 +83,8 @@ struct EmbedTemplate {
     id: String,
     host: String,
     ext: String,
+    thumb_id: String,
+    title: String
 }
 
 /// A wrapper type that we'll use to encapsulate HTML parsed
